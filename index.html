@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pet Value Calculator</title>
+<style>
+    body {
+        font-family: "Times New Roman", serif;
+        background: #f3f3f3;
+        color: #333;
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+    h1 { text-align: center; }
+    .box {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+    label { display: block; margin-top: 10px; }
+    input, select {
+        padding: 6px;
+        width: 100%;
+        margin-top: 3px;
+        font-size: 16px;
+        border: 1px solid #aaa;
+    }
+    .extras-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        margin-top: 10px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        font-size: 18px;
+        background: #444;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover { background: #222; }
+    pre {
+        background: #eee;
+        padding: 15px;
+        border-radius: 6px;
+        white-space: pre-wrap;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Pet Value Calculator</h1>
+
+<div class="box">
+    <label>Category</label>
+    <select id="category">
+        <option>Redstone(4)</option>
+        <option>Redstone(2)</option>
+        <option>Redstone</option>
+        <option>Greystone</option>
+        <option>Battle</option>
+        <option>Premium</option>
+        <option>Seasonal</option>
+        <option>Orphan</option>
+        <option>Quest/Award</option>
+        <option>Main</option>
+        <option>Stray</option>
+    </select>
+
+    <label>Generation (numbers only)</label>
+    <input id="generation" type="number" value="1">
+
+    <label>Age (in months)</label>
+    <input id="age" type="number" value="1">
+
+    <label>Population</label>
+    <input id="population" type="number" value="100">
+
+    <label>Extras (select any):</label>
+    <div class="extras-grid">
+        <label><input type="checkbox" value="Ethereal"> Ethereal</label>
+        <label><input type="checkbox" value="Event"> Event</label>
+        <label><input type="checkbox" value="Elder"> Elder</label>
+        <label><input type="checkbox" value="Painted"> Painted</label>
+        <label><input type="checkbox" value="Glitched"> Glitched</label>
+        <label><input type="checkbox" value="Rare"> Rare</label>
+        <label><input type="checkbox" value="AllCarrier"> AllCarrier</label>
+        <label><input type="checkbox" value="Effect"> Effect</label>
+        <label><input type="checkbox" value="Manual"> Manual</label>
+        <label><input type="checkbox" value="Parentless"> Parentless</label>
+        <label><input type="checkbox" value="BreedOnly"> BreedOnly</label>
+        <label><input type="checkbox" value="Unbreedable"> Unbreedable</label>
+    </div>
+
+    <button onclick="runCalc()">Calculate</button>
+</div>
+
+<div class="box">
+    <h2>Results</h2>
+    <pre id="output">Fill in values and click Calculate.</pre>
+</div>
+
+
+<script>
+// ===============================
+//  PET VALUE CALCULATOR (JavaScript)
+// ===============================
+
+// ---------- Base Costs ----------
+const CATEGORY_BASE_COSTS = {
+    "Redstone(4)": 3200000,
+    "Redstone(2)": 1600000,
+    "Redstone": 800000,
+    "Greystone": 600000,
+    "Battle": 200000,
+    "Premium": 100000,
+    "Seasonal": 100000,
+    "Orphan": 30000,
+    "Quest/Award": 20000,
+    "Main": 5000,
+    "Stray": 4000
+};
+
+// ---------- Extras ----------
+const EXTRA_EFFECTS = {
+    "Ethereal":    v => v * 5 + 5000000,
+    "Event":       v => v * 3 + 3000000,
+    "Elder":       v => v * 2.5 + 2000000,
+    "Painted":     v => v + 500000,
+    "Glitched":    v => v + 250000,
+    "Rare":        v => v + 80000,
+    "AllCarrier":  v => v * 2,
+    "Effect":      v => v * 1.5,
+    "Manual":      v => v * 1.25,
+    "Parentless":  v => v * 1.15,
+    "BreedOnly":   v => v * 1.13,
+    "Unbreedable": v => v * 1.08
+};
+
+// ---------- Calculator ----------
+function calculateValue({ category, generation, ageMonths, population, extras }) {
+    const baseCost = CATEGORY_BASE_COSTS[category] || 0;
+
+    // Generation adjustment
+    let genModifier = generation >= 1
+        ? (1 / Math.pow(2, generation - 1))
+        : 0.25;
+
+    let value = baseCost * genModifier;
+
+    // Monthly inflation (7.5%)
+    const monthlyRate = 0.075;
+    value *= Math.pow(1 + monthlyRate, ageMonths);
+
+    // Population modifier
+    let popModifier = 1;
+
+    if (generation > 0) {
+        if (population < 10) popModifier = 1.45;
+        else if (population <= 150) popModifier = 1.35;
+        else if (population <= 250) popModifier = 1.20;
+        else if (population <= 500) popModifier = 1.15;
+        else if (population <= 1000) popModifier = 1.075;
+        else if (population <= 10000) popModifier = 1.05;
+        else if (population <= 100000) popModifier = 1.025;
+        else if (population <= 200000) popModifier = 1.01;
+        else popModifier = 1.005;
+
+        if (generation > 1 && !extras.includes("BreedOnly")) {
+            const reductionFactor = -0.55;
+            popModifier = 1 + ((popModifier - 1) * reductionFactor);
+        }
+    }
+
+    value *= popModifier;
+
+    // Extras
+    let extraTotal = 0;
+    extras.forEach(e => {
+        if (EXTRA_EFFECTS[e]) extraTotal += EXTRA_EFFECTS[e](value);
+    });
+
+    const finalValue = value + extraTotal;
+
+    let suggested = finalValue < 10000
+        ? "Less than 10,000"
+        : (Math.round(finalValue / 10000) * 10000).toLocaleString();
+
+    return {
+        category,
+        baseCost,
+        generationAdjusted: Math.floor(baseCost * genModifier),
+        ageAdjusted: Math.floor((baseCost * genModifier) * Math.pow(1 + monthlyRate, ageMonths)),
+        populationAdjusted: Math.floor(value),
+        extrasAdded: Math.floor(extraTotal),
+        finalValue: Math.floor(finalValue),
+        suggested
+    };
+}
+
+// ---------- UI Handler ----------
+function runCalc() {
+    const category = document.getElementById("category").value;
+    const generation = Number(document.getElementById("generation").value);
+    const ageMonths = Number(document.getElementById("age").value);
+    const population = Number(document.getElementById("population").value);
+
+    const extras = Array.from(
+        document.querySelectorAll(".extras-grid input:checked")
+    ).map(o => o.value);
+
+    const result = calculateValue({ category, generation, ageMonths, population, extras });
+
+    document.getElementById("output").textContent =
+        `Category: ${result.category}
+Base Value: ${result.baseCost}
+Gen Adjusted: ${result.generationAdjusted}
+Age Adjusted: ${result.ageAdjusted}
+Population Adjusted: ${result.populationAdjusted}
+Extras Added: ${result.extrasAdded}
+--------------------------------
+FINAL VALUE: ${result.finalValue.toLocaleString()}
+Suggested: ${result.suggested}`;
+}
+</script>
+
+</body>
+</html>
