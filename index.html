@@ -76,7 +76,7 @@
         <option>Stray</option>
     </select>
 
-    <label>Generation (numbers only)</label>
+    <label>Generation</label>
     <input id="generation" type="number" value="1">
 
     <label>Age (in months)</label>
@@ -134,16 +134,16 @@ const CATEGORY_BASE_COSTS = {
 const EXTRA_EFFECTS = {
     "Ethereal":    v => v * 5 + 5000000,
     "Event":       v => v * 3 + 3000000,
-    "Elder":       v => v * 2.5 + 2000000,
+    "Elder":       v => v * 2.5 + 1500000,
     "Painted":     v => v + 500000,
-    "Glitched":    v => v + 250000,
+    "Glitched":    v => v + 200000,
     "Rare":        v => v + 80000,
     "AllCarrier":  v => v * 2,
     "Effect":      v => v * 1.5,
-    "Manual":      v => v * 1.25,
-    "Parentless":  v => v * 1.15,
-    "BreedOnly":   v => v * 1.13,
-    "Unbreedable": v => v * 1.08
+    "Manual":      v => v * 1.20,
+    "Parentless":  v => v * 1.12,
+    "BreedOnly":   v => v * 1.10,
+    "Unbreedable": v => v * 1.10
 };
 
 // ---------- Calculator ----------
@@ -165,15 +165,14 @@ function calculateValue({ category, generation, ageMonths, population, extras })
     let popModifier = 1;
 
     if (generation > 0) {
-        if (population < 10) popModifier = 1.45;
-        else if (population <= 150) popModifier = 1.35;
-        else if (population <= 250) popModifier = 1.20;
-        else if (population <= 500) popModifier = 1.15;
-        else if (population <= 1000) popModifier = 1.075;
-        else if (population <= 10000) popModifier = 1.05;
-        else if (population <= 100000) popModifier = 1.025;
-        else if (population <= 200000) popModifier = 1.01;
-        else popModifier = 1.005;
+        if (population < 10) popModifier = 1.25;
+        else if (population <= 150) popModifier = 1.15;
+        else if (population <= 500) popModifier = 1.075;
+        else if (population <= 1000) popModifier = 1.05;
+        else if (population <= 10000) popModifier = 1.025;
+        else if (population <= 100000) popModifier = 1.01;
+        else if (population <= 200000) popModifier = 1.009;
+        else popModifier = 1.0005;
 
         if (generation > 1 && !extras.includes("BreedOnly")) {
             const reductionFactor = -0.55;
