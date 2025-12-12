@@ -165,7 +165,7 @@ function calculateValue({ category, generation, ageMonths, population, extras })
     let popModifier = 1;
 
     if (generation > 0) {
-        if (population < 10) popModifier = 1.25;
+        if (population < 11) popModifier = 1.45;
         else if (population <= 150) popModifier = 1.15;
         else if (population <= 500) popModifier = 1.075;
         else if (population <= 1000) popModifier = 1.05;
