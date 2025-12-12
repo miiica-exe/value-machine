@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Value Machine</title>
-<h4>version 1.0</h4>
+<h4>version 1.1</h4>
 <style>
     body {
         font-family: "Times New Roman", serif;
@@ -162,9 +162,32 @@ function calculateValue({ category, customBase, generation, ageMonths, populatio
             : (CATEGORY_BASE_COSTS[category] || 0);
 
     // Generation adjustment
-    let genModifier = generation >= 1
-        ? (1 / Math.pow(2, generation - 1))
-        : 0.25;
+    // ---------- Generation adjustment ----------
+    const hasNoHalvingExtras = extras.includes("Ethereal") || extras.includes("Glitched");
+    const isBreedOnly = extras.includes("BreedOnly");
+    const isRedstone =
+        category === "Redstone" ||
+        category === "Redstone(2)" ||
+        category === "Redstone(4)";
+
+    let genModifier = 1;
+
+    if (!hasNoHalvingExtras) {
+        if (generation >= 1) {
+            const cappedGen = Math.min(generation, 4);
+
+            if (isBreedOnly) {
+                // quartering instead of halving (75% retained per gen)
+                genModifier = Math.pow(0.75, cappedGen - 1);
+            } else {
+                // normal halving
+                genModifier = Math.pow(0.5, cappedGen - 1);
+            }
+        } else {
+            // negative gens
+            genModifier = isRedstone ? 1 : 1.25;
+        }
+    }
 
     let value = baseCost * genModifier;
 
