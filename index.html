@@ -113,7 +113,7 @@
 
 <script>
 // ===============================
-//  PET VALUE CALCULATOR (JavaScript)
+//  Calculator in JS 
 // ===============================
 
 // ---------- Base Costs ----------
@@ -141,7 +141,7 @@ const EXTRA_EFFECTS = {
     "Rare":        v => v + 80000,
     "AllCarrier":  v => v * 2,
     "Effect":      v => v * 1.5,
-    "Manual":      v => v * 1.20,
+    "Manual":      v => v * 1.20,      // manually restricted later
     "Parentless":  v => v * 1.12,
     "BreedOnly":   v => v * 1.10,
     "Unbreedable": v => v * 1.10
@@ -185,8 +185,14 @@ function calculateValue({ category, generation, ageMonths, population, extras })
 
     // Extras
     let extraTotal = 0;
+
     extras.forEach(e => {
-        if (EXTRA_EFFECTS[e]) extraTotal += EXTRA_EFFECTS[e](value);
+        if (!EXTRA_EFFECTS[e]) return;
+
+        // ⛔ RESTRICTION FOR MANUAL EXTRA
+        if (e === "Manual" && generation < 2) return;
+
+        extraTotal += EXTRA_EFFECTS[e](value);
     });
 
     const finalValue = value + extraTotal;
