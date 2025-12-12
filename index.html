@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pet Value Calculator</title>
+<title>Value Machine</title>
+
 <style>
     body {
         font-family: "Times New Roman", serif;
@@ -57,8 +58,8 @@
 
 <body>
 
-<h1>Pet Value Calculator</h1>
-
+<h1>Value Machine</h1>
+<h2>Pet Value Calculator</h2>
 <div class="box">
     <label>Category</label>
     <select id="category">
@@ -156,7 +157,7 @@ function calculateValue({ category, generation, ageMonths, population, extras })
 
     let value = baseCost * genModifier;
 
-    // Monthly inflation (7.5%)
+    // Monthly inflation
     const monthlyRate = 0.025;
     value *= Math.pow(1 + monthlyRate, ageMonths);
 
