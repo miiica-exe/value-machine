@@ -79,7 +79,7 @@
 
 <!-- Hidden until Custom is selected -->
 <div id="customBaseWrapper" style="display:none; margin-top:10px;">
-    <label>Custom Base Value</label>
+    <label>Custom Value(coins)</label>
     <input id="customBase" type="number" value="0">
 </div>
 
@@ -155,12 +155,11 @@ const EXTRA_EFFECTS = {
 };
 
 // ---------- Calculator ----------
-function calculateValue({ category, generation, ageMonths, population, extras }) {
+function calculateValue({ category, customBase, generation, ageMonths, population, extras }) {
     const baseCost =
-    category === "CUSTOM"
-        ? customBase
-        : (CATEGORY_BASE_COSTS[category] || 0);
-
+        category === "CUSTOM"
+            ? customBase
+            : (CATEGORY_BASE_COSTS[category] || 0);
 
     // Generation adjustment
     let genModifier = generation >= 1
@@ -199,7 +198,7 @@ function calculateValue({ category, generation, ageMonths, population, extras })
 
     extras.forEach(e => {
         if (!EXTRA_EFFECTS[e]) return;
-        if (e === "Manual" && generation < 2) return;
+        if (e === "Manual" && generation < 2) return; // ✅ manual restriction
 
         extraTotal += EXTRA_EFFECTS[e](value);
     });
@@ -221,6 +220,7 @@ function calculateValue({ category, generation, ageMonths, population, extras })
         suggested
     };
 }
+
 function toggleCustomField() {
     const category = document.getElementById("category").value;
     const wrapper = document.getElementById("customBaseWrapper");
