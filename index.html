@@ -136,13 +136,13 @@ const EXTRA_EFFECTS = {
     "Event":       v => v * 3 + 3000000,
     "Elder":       v => v * 2.5 + 1500000,
     "Painted":     v => v + 500000,
-    "Rare":        v => v + 80000,
     "AllCarrier":  v => v * 2,
-    "Glitched":    v => v * 1.55,
+    "Glitched":    v => v * 1.55 + 150000,
+    "Rare":        v => v + 80000,
     "Effect":      v => v * 1.25,
     "Manual":      v => v * 1.20,      // manually restricted later
     "BreedOnly":   v => v * 1.10,
-    "Parentless":  v => v * 1.09,
+    "Parentless":  v => v * 1.10,
     "Unbreedable": v => v * 1.10
 };
 
@@ -166,12 +166,12 @@ function calculateValue({ category, generation, ageMonths, population, extras })
 
     if (generation > 0) {
         if (population < 11) popModifier = 1.45;
-        else if (population <= 150) popModifier = 1.15;
-        else if (population <= 500) popModifier = 1.075;
-        else if (population <= 1000) popModifier = 1.05;
-        else if (population <= 10000) popModifier = 1.025;
-        else if (population <= 100000) popModifier = 1.01;
-        else if (population <= 200000) popModifier = 1.009;
+        else if (population <= 151) popModifier = 1.15;
+        else if (population <= 501) popModifier = 1.075;
+        else if (population <= 1001) popModifier = 1.05;
+        else if (population <= 10001) popModifier = 1.025;
+        else if (population <= 100001) popModifier = 1.01;
+        else if (population <= 200001) popModifier = 1.009;
         else popModifier = 1.0005;
 
         if (generation > 1 && !extras.includes("BreedOnly")) {
