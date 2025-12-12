@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Value Machine</title>
-
+<h4>version 1.0</h4>
 <style>
     body {
         font-family: "Times New Roman", serif;
@@ -62,19 +62,27 @@
 <div class="box">
     <h2>Pet Value Calculator</h2>
     <label>Category</label>
-    <select id="category">
-        <option>Redstone(4)</option>
-        <option>Redstone(2)</option>
-        <option>Redstone</option>
-        <option>Greystone</option>
-        <option>Battle</option>
-        <option>Premium</option>
-        <option>Seasonal</option>
-        <option>Orphan</option>
-        <option>Quest/Award</option>
-        <option>Main</option>
-        <option>Stray</option>
-    </select>
+<select id="category" onchange="toggleCustomField()">
+    <option>Redstone(4)</option>
+    <option>Redstone(2)</option>
+    <option>Redstone</option>
+    <option>Greystone</option>
+    <option>Battle</option>
+    <option>Premium</option>
+    <option>Seasonal</option>
+    <option>Orphan</option>
+    <option>Quest/Award</option>
+    <option>Main</option>
+    <option>Stray</option>
+    <option value="CUSTOM">Custom</option>
+</select>
+
+<!-- Hidden until Custom is selected -->
+<div id="customBaseWrapper" style="display:none; margin-top:10px;">
+    <label>Custom Base Value</label>
+    <input id="customBase" type="number" value="0">
+</div>
+
 
     <label>Generation</label>
     <input id="generation" type="number" value="1">
@@ -148,7 +156,11 @@ const EXTRA_EFFECTS = {
 
 // ---------- Calculator ----------
 function calculateValue({ category, generation, ageMonths, population, extras }) {
-    const baseCost = CATEGORY_BASE_COSTS[category] || 0;
+    const baseCost =
+    category === "CUSTOM"
+        ? customBase
+        : (CATEGORY_BASE_COSTS[category] || 0);
+
 
     // Generation adjustment
     let genModifier = generation >= 1
@@ -209,10 +221,21 @@ function calculateValue({ category, generation, ageMonths, population, extras })
         suggested
     };
 }
+function toggleCustomField() {
+    const category = document.getElementById("category").value;
+    const wrapper = document.getElementById("customBaseWrapper");
+
+    if (category === "CUSTOM") {
+        wrapper.style.display = "block";
+    } else {
+        wrapper.style.display = "none";
+    }
+}
 
 // ---------- UI Handler ----------
 function runCalc() {
     const category = document.getElementById("category").value;
+const customBase = Number(document.getElementById("customBase").value || 0);
     const generation = Number(document.getElementById("generation").value);
     const ageMonths = Number(document.getElementById("age").value);
     const population = Number(document.getElementById("population").value);
@@ -221,7 +244,14 @@ function runCalc() {
         document.querySelectorAll(".extras-grid input:checked")
     ).map(o => o.value);
 
-    const result = calculateValue({ category, generation, ageMonths, population, extras });
+    const result = calculateValue({
+    category,
+    customBase,
+    generation,
+    ageMonths,
+    population,
+    extras
+});
 
     document.getElementById("output").textContent =
         `Category: ${result.category}
