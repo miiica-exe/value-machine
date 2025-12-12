@@ -157,7 +157,7 @@ function calculateValue({ category, generation, ageMonths, population, extras })
     let value = baseCost * genModifier;
 
     // Monthly inflation (7.5%)
-    const monthlyRate = 0.075;
+    const monthlyRate = 0.025;
     value *= Math.pow(1 + monthlyRate, ageMonths);
 
     // Population modifier
