@@ -143,69 +143,70 @@ const CATEGORY_BASE_COSTS = {
 // ---------- EXTRA EFFECTS (CATEGORY-AWARE) ----------
 const EXTRA_EFFECTS = {
     Ethereal: {
-        "Redstone": v => v + 4000000,
-        "Redstone(2)": v => v + 4500000,
-        "Redstone(4)": v => v + 4500000,
-        "Greystone": v => v + 4000000,
-        "Battle": v => v + 4000000,
-        "Premium": v =>v + 4000000,
-        "Seasonal": v => v + 3500000,
-        "Orphan": v => v + 4500000,
-        "Quest/Award": v => v + 2500000,
-        "Main": v => v + 3000000,
-        "Stray": v => v + 3500000,
-        "CUSTOM": v => v + 4000000
+        "Redstone":     v => 4000000,
+        "Redstone(2)":  v => 4500000,
+        "Redstone(4)":  v => 4500000,
+        "Greystone":    v => 4000000,
+        "Battle":       v => 4000000,
+        "Premium":      v => 4000000,
+        "Seasonal":     v => 3500000,
+        "Orphan":       v => 4500000,
+        "Quest/Award":  v => 2500000,
+        "Main":         v => 3000000,
+        "Stray":        v => 3500000,
+        "CUSTOM":       v => 4000000
     },
     Elder: {
-        default: v => v * 2.5 + 1500000,
+        default: v => (v * 1.5) + 1500000   // adds 150% + flat
     },
     Glitched: {
-        "Redstone": v => v + 300000,
-        "Redstone(2)": v => v + 250000,
-        "Redstone(4)": v => v + 250000,
-        "Greystone": v => v + 300000,
-        "Battle": v => v + 400000,
-        "Premium": v => v + 400000,
-        "Seasonal": v => v + 350000,
-        "Orphan": v => v + 450000,
-        "Quest/Award": v => v + 250000,
-        "Main": v => v + 300000,
-        "Stray": v => v + 350000,
-        "CUSTOM": v => v + 200000
+        "Redstone":     v => 300000,
+        "Redstone(2)":  v => 250000,
+        "Redstone(4)":  v => 250000,
+        "Greystone":    v => 300000,
+        "Battle":       v => 400000,
+        "Premium":      v => 400000,
+        "Seasonal":     v => 350000,
+        "Orphan":       v => 450000,
+        "Quest/Award":  v => 250000,
+        "Main":         v => 300000,
+        "Stray":        v => 350000,
+        "CUSTOM":       v => 200000
     },
     AllCarrier: {
-        default: v => v * 2
+        default: v => v * 1.0   // adds 100%
     },
     Manual: {
-        default: v => v * 1.25
+        default: v => v * 0.25  // +25%
     },
     BreedOnly: {
-        default: v => v * 1.35,
-        "CUSTOM": v => v + 9000
+        default: v => v * 0.35, // +35%
+        "CUSTOM": v => 9000
     },
     Event: {
-        default: v => v * 1.25 + 150000,
+        default: v => (v * 0.25) + 150000
     },
     Painted: {
-        default: v => v + 500000,
-        "CUSTOM": v => v + 250000
+        default: v => 500000,
+        "CUSTOM": v => 250000
     },
     Rare: {
-        default: v => v * 1.05,
-        "Stray": v => v + 10000,
-        "Battle": v => v + 85000
+        default: v => v * 0.05, // +5%
+        "Stray":  v => 10000,
+        "Battle": v => 85000
     },
     Effect: {
-        default: v => v * 1,
-        "Orphan": v => v * 1.15 + 10000,
+        default: v => 0,
+        "Orphan": v => (v * 0.15) + 10000
     },
     Parentless: {
-        default: v => v * 1.15
+        default: v => v * 0.15
     },
     Unbreedable: {
-        default: v => v + 200000
+        default: v => 200000
     }
 };
+
 
 
 // ===============================
