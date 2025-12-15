@@ -349,6 +349,49 @@ function calculateValue({
                 : (Math.round(finalValue / 10000) * 10000).toLocaleString()
     };
 }
+// ===============================
+//  UI HANDLING
+// ===============================
+
+function toggleCustomField() {
+    const category = document.getElementById("category").value;
+    const wrapper = document.getElementById("customBaseWrapper");
+
+    wrapper.style.display = category === "CUSTOM" ? "block" : "none";
+}
+
+function runCalc() {
+    const category   = document.getElementById("category").value;
+    const customBase = Number(document.getElementById("customBase").value || 0);
+    const generation = Number(document.getElementById("generation").value);
+    const ageMonths  = Number(document.getElementById("age").value);
+    const population = Number(document.getElementById("population").value);
+
+    const extras = Array.from(
+        document.querySelectorAll(".extras-grid input:checked")
+    ).map(el => el.value);
+
+    const result = calculateValue({
+        category,
+        customBase,
+        generation,
+        ageMonths,
+        population,
+        extras
+    });
+
+    document.getElementById("output").textContent = `
+Category: ${result.category}
+Base Value: ${result.baseCost}
+Gen Adjusted: ${result.generationAdjusted}
+Age Adjusted: ${result.ageAdjusted}
+Population Adjusted: ${result.populationAdjusted}
+Extras Added: ${result.extrasAdded}
+--------------------------------
+FINAL VALUE: ${result.finalValue.toLocaleString()}
+Suggested: ${result.suggested}
+`.trim();
+}
 
 </script>
 
