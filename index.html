@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+    <h4>version 1.2</h4>
 <title>Value Machine</title>
-<h4>version 1.1</h4>
 <style>
     body {
         font-family: "Times New Roman", serif;
@@ -102,7 +102,7 @@
         <label><input type="checkbox" value="Glitched"> Glitched <abbr title="For most visible glitches, missing layers, etc">?</abbr></label>
         <label><input type="checkbox" value="Rare"> Rare <abbr title="Rare strays, rare coloring.">?</abbr></label>
         <label><input type="checkbox" value="AllCarrier"> All Carrier <abbr title="Only applies to pets that carry all genes">?</abbr></label>
-        <label><input type="checkbox" value="Effect"> Effect <abbr title="Only applies to pets from orhapn releases that have an effect">?</abbr></label>
+        <label><input type="checkbox" value="Effect"> Effect <abbr title="Only applies to pets from orphan releases that have an effect">?</abbr></label>
         <label><input type="checkbox" value="Manual"> Manual Breeding <abbr title="For G2+ pets with manual breeding(Common Cat, Persian Cat, some Palace Cats, some Star Cats)">?</abbr></label>
         <label><input type="checkbox" value="Parentless"> Parentless <abbr title="Only applies to G1 pets with no found parents">?</abbr></label>
         <label><input type="checkbox" value="BreedOnly"> Breed-Only Variant <abbr title="Only applies to mutations that can only be obtained through breeding">?</abbr></label>
@@ -120,10 +120,11 @@
 
 <script>
 // ===============================
-//  Calculator in JS 
+//  VALUE MACHINE — CORE LOGIC
 // ===============================
 
-// ---------- Base Costs ----------
+
+// ---------- CATEGORY BASE COSTS ----------
 const CATEGORY_BASE_COSTS = {
     "Redstone(4)": 3200000,
     "Redstone(2)": 1600000,
@@ -138,155 +139,217 @@ const CATEGORY_BASE_COSTS = {
     "Stray": 4000
 };
 
-// ---------- Extras ----------
+
+// ---------- EXTRA EFFECTS (CATEGORY-AWARE) ----------
 const EXTRA_EFFECTS = {
-    "Ethereal":    v => v * 5 + 5000000,
-    "Event":       v => v * 3 + 3000000,
-    "Elder":       v => v * 2.5 + 1500000,
-    "Painted":     v => v + 500000,
-    "Glitched":    v => v * 2 + 150000,
-    "AllCarrier":  v => v * 2,
-    "Rare":        v => v + 80000,
-    "Effect":      v => v * 1.25,
-    "Manual":      v => v * 1.20,      // manually restricted later
-    "BreedOnly":   v => v * 1.10,
-    "Parentless":  v => v * 1.10,
-    "Unbreedable": v => v * 1.10
+    Ethereal: {
+        "Redstone": v => v + 3000000,
+        "Redstone(2)": v => v + 2500000,
+        "Redstone(4)": v => v + 2500000,
+        "Greystone": v => v + 3000000,
+        "Battle": v => v + 4000000,
+        "Premium": v =>v + 4000000,
+        "Seasonal": v => v + 3500000,
+        "Orphan": v => v + 4500000,
+        "Quest/Award": v => v + 2500000,
+        "Main": v => v + 3000000,
+        "Stray": v => v + 3500000,
+        "CUSTOM": v => v + 4000000
+    },
+    Elder: {
+        default: v => v * 2.5 + 1500000,
+    },
+    Glitched: {
+        "Redstone": v => v + 300000,
+        "Redstone(2)": v => v + 250000,
+        "Redstone(4)": v => v + 250000,
+        "Greystone": v => v + 300000,
+        "Battle": v => v + 400000,
+        "Premium": v => v + 400000,
+        "Seasonal": v => v + 350000,
+        "Orphan": v => v + 450000,
+        "Quest/Award": v => v + 250000,
+        "Main": v => v + 300000,
+        "Stray": v => v + 350000,
+        "CUSTOM": v => v + 200000
+    },
+    AllCarrier: {
+        default: v => v * 2
+    },
+    Manual: {
+        default: v => v * 1.25
+    },
+    BreedOnly: {
+        default: v => v * 1.35,
+        "CUSTOM": v => v + 9000
+    },
+    Event: {
+        default: v => v * 1.25 + 150000,
+    },
+    Painted: {
+        default: v => v + 500000,
+        "CUSTOM": v => v + 250000
+    },
+    Rare: {
+        default: v => v * 1.05,
+        "Stray": v => v + 10000,
+        "Battle": v => v + 85000
+    },
+    Effect: {
+        default: v => v * 1,
+        "Orphan": v => v * 1.15 + 10000,
+    },
+    Parentless: {
+        default: v => v * 1.15
+    },
+    Unbreedable: {
+        default: v => v + 200000
+    }
 };
 
-// ---------- Calculator ----------
-function calculateValue({ category, customBase, generation, ageMonths, population, extras }) {
-    const baseCost =
-        category === "CUSTOM"
-            ? customBase
-            : (CATEGORY_BASE_COSTS[category] || 0);
 
-    // Generation adjustment
-    // ---------- Generation adjustment ----------
-    const hasNoHalvingExtras = extras.includes("Ethereal") || extras.includes("Glitched");
-    const isBreedOnly = extras.includes("BreedOnly");
+// ===============================
+//  HELPERS
+// ===============================
+
+// Base value
+function getBaseCost(category, customBase) {
+    return category === "CUSTOM"
+        ? customBase
+        : (CATEGORY_BASE_COSTS[category] || 0);
+}
+
+
+// ---------- GENERATION MODIFIER ----------
+function getGenerationModifier(category, generation, extras) {
+
     const isRedstone =
         category === "Redstone" ||
         category === "Redstone(2)" ||
         category === "Redstone(4)";
 
-    let genModifier = 1;
-
-    if (!hasNoHalvingExtras) {
-        if (generation >= 1) {
-            const cappedGen = Math.min(generation, 4);
-
-            if (isBreedOnly) {
-                // quartering instead of halving (75% retained per gen)
-                genModifier = Math.pow(0.75, cappedGen - 1);
-            } else {
-                // normal halving
-                genModifier = Math.pow(0.5, cappedGen - 1);
-            }
-        } else {
-            // negative gens
-            genModifier = isRedstone ? 1 : 1.25;
-        }
+    // Ethereal ignores ALL generation penalties
+    if (extras.includes("Ethereal")) {
+        return 1;
     }
 
-    let value = baseCost * genModifier;
+    // Base generation modifier
+    let modifier = 1;
 
-    // Monthly inflation
-    const monthlyRate = 0.025;
-    value *= Math.pow(1 + monthlyRate, ageMonths);
+    // Positive generations
+    if (generation >= 1) {
+        const cappedGen = Math.min(generation, 4);
 
-    // Population modifier
-    let popModifier = 1;
-
-    if (generation > 0) {
-        if (population < 11) popModifier = 1.45;
-        else if (population <= 151) popModifier = 1.15;
-        else if (population <= 501) popModifier = 1.075;
-        else if (population <= 1001) popModifier = 1.05;
-        else if (population <= 10001) popModifier = 1.025;
-        else if (population <= 100001) popModifier = 1.01;
-        else if (population <= 200001) popModifier = 1.009;
-        else popModifier = 1.0005;
-
-        if (generation > 1 && !extras.includes("BreedOnly")) {
-            const reductionFactor = -0.55;
-            popModifier = 1 + ((popModifier - 1) * reductionFactor);
-        }
+        // G1 = 1, G2 = 1/2, G3 = 1/4, G4+ = 1/8
+        modifier = Math.pow(0.5, cappedGen - 1);
+    }
+    // Negative generations
+    else {
+        modifier = isRedstone ? 1 : (1 / 3);
     }
 
-    value *= popModifier;
+    // Softened penalty for certain extras
+    const softeningExtras = ["Glitched", "BreedOnly", "Manual"];
+    const hasSoftening = softeningExtras.some(e => extras.includes(e));
 
-    // Extras
-    let extraTotal = 0;
+    if (hasSoftening) {
+        // halve the penalty (move halfway back to 1)
+        modifier = 1 - ((1 - modifier) / 2);
+    }
 
-    extras.forEach(e => {
-        if (!EXTRA_EFFECTS[e]) return;
-        if (e === "Manual" && generation < 2) return; // ✅ manual restriction
+    return modifier;
+}
 
-        extraTotal += EXTRA_EFFECTS[e](value);
+
+// ---------- POPULATION MODIFIER ----------
+function getPopulationModifier(generation, population, extras) {
+    if (generation <= 0) return 1;
+
+    let modifier;
+
+    if (population < 11) modifier = 1.45;
+    else if (population <= 151) modifier = 1.15;
+    else if (population <= 501) modifier = 1.075;
+    else if (population <= 1001) modifier = 1.05;
+    else if (population <= 10001) modifier = 1.025;
+    else if (population <= 100001) modifier = 1.01;
+    else if (population <= 200001) modifier = 1.009;
+    else modifier = 1.0005;
+
+    // Breed-only protects against population reduction
+    if (generation > 1 && !extras.includes("BreedOnly")) {
+        modifier = 1 + ((modifier - 1) * -0.55);
+    }
+
+    return modifier;
+}
+
+
+// ---------- EXTRAS ----------
+function calculateExtras(value, category, generation, extras) {
+    let total = 0;
+
+    extras.forEach(extra => {
+        const rule = EXTRA_EFFECTS[extra];
+        if (!rule) return;
+
+        // Manual restriction
+        if (extra === "Manual" && generation < 2) return;
+
+        const fn = rule[category] || rule.default;
+        if (typeof fn === "function") {
+            total += fn(value);
+        }
     });
 
-    const finalValue = value + extraTotal;
-
-    let suggested = finalValue < 10000
-        ? "Less than 10,000"
-        : (Math.round(finalValue / 10000) * 10000).toLocaleString();
-
-    return {
-        category,
-        baseCost,
-        generationAdjusted: Math.floor(baseCost * genModifier),
-        ageAdjusted: Math.floor((baseCost * genModifier) * Math.pow(1 + monthlyRate, ageMonths)),
-        populationAdjusted: Math.floor(value),
-        extrasAdded: Math.floor(extraTotal),
-        finalValue: Math.floor(finalValue),
-        suggested
-    };
+    return total;
 }
 
-function toggleCustomField() {
-    const category = document.getElementById("category").value;
-    const wrapper = document.getElementById("customBaseWrapper");
 
-    if (category === "CUSTOM") {
-        wrapper.style.display = "block";
-    } else {
-        wrapper.style.display = "none";
-    }
-}
-
-// ---------- UI Handler ----------
-function runCalc() {
-    const category = document.getElementById("category").value;
-const customBase = Number(document.getElementById("customBase").value || 0);
-    const generation = Number(document.getElementById("generation").value);
-    const ageMonths = Number(document.getElementById("age").value);
-    const population = Number(document.getElementById("population").value);
-
-    const extras = Array.from(
-        document.querySelectorAll(".extras-grid input:checked")
-    ).map(o => o.value);
-
-    const result = calculateValue({
+// ===============================
+//  MAIN CALCULATOR
+// ===============================
+function calculateValue({
     category,
     customBase,
     generation,
     ageMonths,
     population,
     extras
-});
+}) {
 
-    document.getElementById("output").textContent =
-        `Category: ${result.category}
-Base Value: ${result.baseCost}
-Gen Adjusted: ${result.generationAdjusted}
-Age Adjusted: ${result.ageAdjusted}
-Population Adjusted: ${result.populationAdjusted}
-Extras Added: ${result.extrasAdded}
---------------------------------
-FINAL VALUE: ${result.finalValue.toLocaleString()}
-Suggested: ${result.suggested}`;
+    // Base
+    const baseCost = getBaseCost(category, customBase);
+
+    // Generation
+    const genModifier = getGenerationModifier(category, generation, extras);
+    let value = baseCost * genModifier;
+
+    // Age
+    const monthlyRate = 0.025;
+    value *= Math.pow(1 + monthlyRate, ageMonths);
+
+    // Population
+    value *= getPopulationModifier(generation, population, extras);
+
+    // Extras
+    const extrasAdded = calculateExtras(value, category, generation, extras);
+    const finalValue = value + extrasAdded;
+
+    return {
+        category,
+        baseCost,
+        generationAdjusted: Math.floor(baseCost * genModifier),
+        populationAdjusted: Math.floor(value),
+        extrasAdded: Math.floor(extrasAdded),
+        finalValue: Math.floor(finalValue),
+        suggested:
+            finalValue < 10000
+                ? "Less than 10,000"
+                : (Math.round(finalValue / 10000) * 10000).toLocaleString()
+    };
 }
+
 </script>
 
 </body>
