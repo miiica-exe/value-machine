@@ -317,38 +317,47 @@ function calculateValue({
     population,
     extras
 }) {
-
-    // Base
     const baseCost = getBaseCost(category, customBase);
 
-    // Generation
+    // ----- Generation -----
     const genModifier = getGenerationModifier(category, generation, extras);
-    let value = baseCost * genModifier;
+    const genAdjusted = baseCost * genModifier;
 
-    // Age
+    // ----- Age -----
     const monthlyRate = 0.025;
-    value *= Math.pow(1 + monthlyRate, ageMonths);
+    const ageAdjusted = genAdjusted * Math.pow(1 + monthlyRate, ageMonths);
 
-    // Population
-    value *= getPopulationModifier(generation, population, extras);
+    // ----- Population -----
+    const popModifier = getPopulationModifier(generation, population, extras);
+    const populationAdjusted = ageAdjusted * popModifier;
 
-    // Extras
-    const extrasAdded = calculateExtras(value, category, generation, extras);
-    const finalValue = value + extrasAdded;
+    // ----- Extras -----
+    const extrasAdded = calculateExtras(
+        populationAdjusted,
+        category,
+        generation,
+        extras
+    );
+
+    const finalValue = populationAdjusted + extrasAdded;
+
+    const suggested =
+        finalValue < 10000
+            ? "Less than 10,000"
+            : (Math.round(finalValue / 10000) * 10000).toLocaleString();
 
     return {
         category,
-        baseCost,
-        generationAdjusted: Math.floor(baseCost * genModifier),
-        populationAdjusted: Math.floor(value),
+        baseCost: Math.floor(baseCost),
+        generationAdjusted: Math.floor(genAdjusted),
+        ageAdjusted: Math.floor(ageAdjusted),
+        populationAdjusted: Math.floor(populationAdjusted),
         extrasAdded: Math.floor(extrasAdded),
         finalValue: Math.floor(finalValue),
-        suggested:
-            finalValue < 10000
-                ? "Less than 10,000"
-                : (Math.round(finalValue / 10000) * 10000).toLocaleString()
+        suggested
     };
 }
+
 // ===============================
 //  UI HANDLING
 // ===============================
