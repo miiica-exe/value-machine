@@ -179,7 +179,7 @@ const EXTRA_EFFECTS = {
         default: v => v * 0.25  // +25%
     },
     BreedOnly: {
-        default: v => v * 0.35, // +35%
+        default: v => v * 0.25, // +35%
         "CUSTOM": v => 9000
     },
     Event: {
@@ -267,8 +267,8 @@ function getPopulationModifier(generation, population, extras) {
 
     let modifier;
 
-    if (population < 11) modifier = 1.45;
-    else if (population <= 151) modifier = 1.15;
+    if (population < 11) modifier = 1.30;
+    else if (population <= 151) modifier = 1.10;
     else if (population <= 501) modifier = 1.075;
     else if (population <= 1001) modifier = 1.05;
     else if (population <= 10001) modifier = 1.025;
