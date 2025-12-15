@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-    <h4>version 1.2</h4>
 <title>Value Machine</title>
 <style>
     body {
@@ -404,6 +403,48 @@ Suggested: ${result.suggested}
 }
 
 </script>
+<div class="box">
+    <h2>How This Works</h2>
+
+    <p>
+        The Value Machine estimates a pet’s coin value based on a variety of factors.
+        The Category, or pet's origin, determines the base value.
+        The generation modifies the base value as follows;
+             G2 = 1/2 of G1
+             G3 = 1/4 of G1
+             G4 or higher = 1/8 of G1
+             G0 or negative generation pets by default are 1/3 of G1
+        Ethereal pets are not affected by generation.
+        Redstone pets are not affected by negative generation penalties.
+        Glitched, Breed-Only variants, and Manually bred pets receive half penalty for generations.
+        The modified base value gets a 2.5% monthly boost, valuing older pets more highly.
+        Extras are then added independantly, some adding static amounts and some adding percentages.
+        Each Category has its own set of rules for extras(Strays and Id's pets will react differently)
+             
+        
+    </p>
+
+    <ul>
+        <li><strong>Category</strong> sets the base value.</li>
+        <li><strong>Generation</strong> reduces value depending on rules.</li>
+        <li><strong>Age</strong> increases value over time.</li>
+        <li><strong>Population</strong> adjusts value based on rarity.</li>
+        <li><strong>Extras</strong> add flat bonuses or percentage-based increases.</li>
+    </ul>
+
+    <p>
+        This tool is intended to be used for suggested prices when there
+        are no others of a given type on market. 
+        Feel free to reach out to xanje.com/~miiica if you encounter issues.
+    </p>
+
+    <hr>
+
+    <p style="font-size: 0.9em; color: #666;">
+        <strong>Version:</strong> 1.3<br>
+        <strong>Last Updated:</strong> 12-15-2025 13:00 XST
+    </p>
+</div>
 
 </body>
 </html>
