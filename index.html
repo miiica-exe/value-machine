@@ -100,7 +100,7 @@
     <label>Extras (select any):</label>
     <div class="extras-grid">
         <label><input type="checkbox" value="Ethereal"> Ethereal <abbr title="Only applies to pets with ethereal/star attribute">?</abbr></label>
-        <label><input type="checkbox" value="Event"> Special Attribute <abbr title="Pledged in crowdfunned, blessed by Yanne, kumforted, NOT for orphan effects or recolored pets">?</abbr></label>
+        <label><input type="checkbox" value="Event"> Exclusive Attribute <abbr title="Pledged in crowdfunned, blessed by Yanne, cursed by Krora, kumforted, gift box exclusive, NOT for orphan effects or recolored pets">?</abbr></label>
         <label><input type="checkbox" value="Elder"> Elder <abbr title="Only applies to pets 10+ years old">?</abbr></label>
         <label><input type="checkbox" value="Painted"> Painted <abbr title="Only applies to a pet has been colored in Carrie's">?</abbr></label>
         <label><input type="checkbox" value="Glitched"> Glitched <abbr title="For most visible glitches, missing layers, etc">?</abbr></label>
@@ -207,7 +207,8 @@ const EXTRA_EFFECTS = {
         "Orphan": v => (v * 0.15) + 10000
     },
     Parentless: {
-        default: v => v * 0.15
+        default: v => v * 0.15,
+        "Elder": v => v * 0.25
     },
     Unbreedable: {
         default: v => 200000
