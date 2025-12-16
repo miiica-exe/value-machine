@@ -65,6 +65,25 @@
 
 <div class="box">
     <h2>Pet Value Calculator</h2>
+    <div class="market-grid">
+    <label>
+        Sales (7 days)
+        <input id="market7" type="number" value="0">
+    </label>
+
+    <label>
+        Sales (30 days)
+        <input id="market30" type="number" value="0">
+    </label>
+
+    <label>
+        Current Listings
+        <input id="marketCurrent" type="number" value="0">
+    </label>
+</div>
+
+<hr>
+
     <label>Category</label>
 <select id="category" onchange="toggleCustomField()">
     <option>Main</option>
@@ -91,8 +110,12 @@
     <label>Generation <abbr title="If the pet is G1, use the G1 population from the library. Otherwise use total.">?</abbr></label>
     <input id="generation" type="number" value="1">
 
+    <label>Birthday</label>
+    <input id="birthday" type="date">
+
     <label>Age (in months)</label>
-    <input id="age" type="number" value="1">
+    <input id="age" type="number" value="1" disabled>
+
 
     <label>Population</label>
     <input id="population" type="number" value="100">
@@ -101,7 +124,6 @@
     <div class="extras-grid">
         <label><input type="checkbox" value="Ethereal"> Ethereal <abbr title="Only applies to pets with ethereal/star attribute">?</abbr></label>
         <label><input type="checkbox" value="Event"> Exclusive Attribute <abbr title="Pledged in crowdfunned, blessed by Yanne, cursed by Krora, kumforted, gift box exclusive, NOT for orphan effects or recolored pets">?</abbr></label>
-        <label><input type="checkbox" value="Elder"> Elder <abbr title="Only applies to pets 10+ years old">?</abbr></label>
         <label><input type="checkbox" value="Painted"> Painted <abbr title="Only applies to a pet has been colored in Carrie's">?</abbr></label>
         <label><input type="checkbox" value="Glitched"> Glitched <abbr title="For most visible glitches, missing layers, etc">?</abbr></label>
         <label><input type="checkbox" value="Rare"> Rare <abbr title="Rare strays, rare coloring.">?</abbr></label>
@@ -109,8 +131,10 @@
         <label><input type="checkbox" value="Effect"> Effect <abbr title="Only applies to pets from orphan releases that have an effect">?</abbr></label>
         <label><input type="checkbox" value="Manual"> Manual Breeding <abbr title="For G2+ pets with manual breeding(Common Cat, Persian Cat, some Palace Cats, some Star Cats)">?</abbr></label>
         <label><input type="checkbox" value="Parentless"> Parentless <abbr title="Only applies to G1 pets with no found parents">?</abbr></label>
+        <label><input type="checkbox" value="Childless"> Childless(optional) <abbr title="For use if pets with no offspring are preferred.">?</abbr></label>
         <label><input type="checkbox" value="BreedOnly"> Breed-Only Variant <abbr title="Only applies to mutations that can only be obtained through breeding">?</abbr></label>
         <label><input type="checkbox" value="Unbreedable"> Unbreedable <abbr title="Only applies to certain older pets that have unfinished linework and cannot be bred">?</abbr></label>
+        <label><input type="checkbox" value="Ungrown"> Ungrown <abbr title="Mostly for use in 10+ year old pets. Increases 10+ year old pets, reduces 3- month olds">?</abbr></label>
     </div>
 
     <button onclick="runCalc()">Calculate</button>
@@ -144,84 +168,81 @@ const CATEGORY_BASE_COSTS = {
 };
 
 
-// ---------- EXTRA EFFECTS (CATEGORY-AWARE) ----------
+// ---------- AGE CURVES (CATEGORY-SPECIFIC) ----------
+// Faster growth in first 12 months, slower afterward
+const AGE_CURVES = {
+    "Redstone":     { early: 0.045, late: 0.015 },
+    "Redstone(2)":  { early: 0.045, late: 0.015 },
+    "Redstone(4)":  { early: 0.045, late: 0.015 },
+    "Greystone":    { early: 0.04,  late: 0.014 },
+    "Battle":       { early: 0.035, late: 0.012 },
+    "Premium":      { early: 0.03,  late: 0.01 },
+    "Seasonal":     { early: 0.028, late: 0.01 },
+    "Orphan":       { early: 0.02,  late: 0.008 },
+    "Quest/Award":  { early: 0.02,  late: 0.008 },
+    "Main":         { early: 0.018, late: 0.006 },
+    "Stray":        { early: 0.015, late: 0.005 },
+    "CUSTOM":       { early: 0.03,  late: 0.01 }
+};
+
+
+// ---------- EXTRA EFFECTS ----------
 const EXTRA_EFFECTS = {
     Ethereal: {
-        "Redstone":     v => 4000000,
-        "Redstone(2)":  v => 4500000,
-        "Redstone(4)":  v => 4500000,
-        "Greystone":    v => 4000000,
-        "Battle":       v => 4000000,
-        "Premium":      v => 4000000,
-        "Seasonal":     v => 3500000,
-        "Orphan":       v => 4500000,
-        "Quest/Award":  v => 2500000,
-        "Main":         v => 3000000,
-        "Stray":        v => 3500000,
-        "CUSTOM":       v => 4000000
+        default: v => 4000000
     },
-    Elder: {
-        default: v => (v * 1.5) + 1500000   // adds 150% + flat
-    },
+
     Glitched: {
-        "Redstone":     v => 300000,
-        "Redstone(2)":  v => 250000,
-        "Redstone(4)":  v => 250000,
-        "Greystone":    v => 300000,
-        "Battle":       v => 400000,
-        "Premium":      v => 400000,
-        "Seasonal":     v => 350000,
-        "Orphan":       v => 450000,
-        "Quest/Award":  v => 250000,
-        "Main":         v => 300000,
-        "Stray":        v => 350000,
-        "CUSTOM":       v => 200000
+        default: v => v * 0.15
     },
-    AllCarrier: {
-        default: v => v * 1.0   // adds 100%
-    },
+
     Manual: {
-        default: v => v * 0.25  // +25%
+        default: v => v * 0.25
     },
+
     BreedOnly: {
-        default: v => v * 0.20, // +35%
-        "CUSTOM": v => 9000
+        default: v => v * 0.20
     },
+
     Event: {
-        default: v => (v * 0.35) + 350000,
-        "Redstone": v => (v * 0.25) + 50000,
-        "Redstone(2)": v => (v * 0.25) + 50000,
-        "Redstone(4)": v => (v * 0.25) + 50000,
+        default: v => (v * 0.35) + 350000
     },
+
     Painted: {
-        default: v => 500000,
-        "CUSTOM": v => 250000
+        default: v => 500000
     },
+
     Rare: {
-        default: v => v * 0.05, // +5%
-        "Stray":  v => 10000,
-        "Battle": v => 85000
+        default: v => v * 0.05
     },
+
     Effect: {
-        default: v => 0,
-        "Orphan": v => (v * 0.15) + 10000
+        default: v => v * 0.10
     },
+
     Parentless: {
-        default: v => v * 0.15,
-        "Elder": v => v * 0.25
+        default: v => v * 0.15
     },
+
+    Childless: {
+        default: v => v * 0.10
+    },
+
+    Ungrown: {
+        // special handling later
+        default: v => 0
+    },
+
     Unbreedable: {
         default: v => 200000
     }
 };
 
 
-
 // ===============================
 //  HELPERS
 // ===============================
 
-// Base value
 function getBaseCost(category, customBase) {
     return category === "CUSTOM"
         ? customBase
@@ -233,40 +254,43 @@ function getBaseCost(category, customBase) {
 function getGenerationModifier(category, generation, extras) {
 
     const isRedstone =
-        category === "Redstone" ||
-        category === "Redstone(2)" ||
-        category === "Redstone(4)";
+        category.includes("Redstone");
 
     // Ethereal ignores ALL generation penalties
-    if (extras.includes("Ethereal")) {
-        return 1;
-    }
+    if (extras.includes("Ethereal")) return 1;
 
-    // Base generation modifier
     let modifier = 1;
 
-    // Positive generations
     if (generation >= 1) {
-        const cappedGen = Math.min(generation, 4);
-
-        // G1 = 1, G2 = 1/2, G3 = 1/4, G4+ = 1/8
-        modifier = Math.pow(0.5, cappedGen - 1);
-    }
-    // Negative generations
-    else {
+        const capped = Math.min(generation, 4);
+        modifier = Math.pow(0.5, capped - 1);
+    } else {
         modifier = isRedstone ? 1 : (1 / 3);
     }
 
-    // Softened penalty for certain extras
+    // Softening
     const softeningExtras = ["Glitched", "BreedOnly", "Manual"];
-    const hasSoftening = softeningExtras.some(e => extras.includes(e));
-
-    if (hasSoftening) {
-        // halve the penalty (move halfway back to 1)
+    if (softeningExtras.some(e => extras.includes(e))) {
         modifier = 1 - ((1 - modifier) / 2);
     }
 
     return modifier;
+}
+
+
+// ---------- AGE CALCULATION ----------
+function calculateAgeAdjusted(value, category, ageMonths) {
+    const curve = AGE_CURVES[category] || AGE_CURVES["CUSTOM"];
+
+    let adjusted = value;
+
+    const earlyMonths = Math.min(ageMonths, 12);
+    const lateMonths = Math.max(ageMonths - 12, 0);
+
+    adjusted *= Math.pow(1 + curve.early, earlyMonths);
+    adjusted *= Math.pow(1 + curve.late, lateMonths);
+
+    return adjusted;
 }
 
 
@@ -280,12 +304,8 @@ function getPopulationModifier(generation, population, extras) {
     else if (population <= 151) modifier = 1.10;
     else if (population <= 501) modifier = 1.075;
     else if (population <= 1001) modifier = 1.05;
-    else if (population <= 10001) modifier = 1.025;
-    else if (population <= 100001) modifier = 1.01;
-    else if (population <= 200001) modifier = 1.009;
-    else modifier = 1.0005;
+    else modifier = 1.02;
 
-    // Breed-only protects against population reduction
     if (generation > 1 && !extras.includes("BreedOnly")) {
         modifier = 1 + ((modifier - 1) * -0.55);
     }
@@ -295,15 +315,25 @@ function getPopulationModifier(generation, population, extras) {
 
 
 // ---------- EXTRAS ----------
-function calculateExtras(value, category, generation, extras) {
+function calculateExtras(value, category, generation, ageMonths, extras) {
     let total = 0;
 
     extras.forEach(extra => {
         const rule = EXTRA_EFFECTS[extra];
         if (!rule) return;
 
-        // Manual restriction
         if (extra === "Manual" && generation < 2) return;
+        if (extra === "BreedOnly" && generation === 1) return;
+
+        // Ungrown special behavior
+        if (extra === "Ungrown") {
+            if (ageMonths >= 120) {
+                total += value; // doubles value
+            } else if (ageMonths < 3) {
+                total -= value * 0.15;
+            }
+            return;
+        }
 
         const fn = rule[category] || rule.default;
         if (typeof fn === "function") {
@@ -315,6 +345,28 @@ function calculateExtras(value, category, generation, extras) {
 }
 
 
+// ---------- MARKET INFLUENCE ----------
+function calculateMarketInfluence(finalValue, market) {
+    const values = [];
+
+    if (market.week > 0) values.push(market.week);
+    if (market.month > 0) values.push(market.month);
+    if (market.current > 0) values.push(market.current);
+
+    if (values.length === 0) return finalValue;
+
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+    // All three filled → market dominates
+    if (values.length === 3) {
+        return (finalValue * 0.35) + (avg * 0.65);
+    }
+
+    // Partial influence
+    return (finalValue * 0.6) + (avg * 0.4);
+}
+
+
 // ===============================
 //  MAIN CALCULATOR
 // ===============================
@@ -322,68 +374,60 @@ function calculateValue({
     category,
     customBase,
     generation,
-    ageMonths,
+    birthdate,
     population,
-    extras
+    extras,
+    market
 }) {
     const baseCost = getBaseCost(category, customBase);
 
-    // ----- Generation -----
-    const genModifier = getGenerationModifier(category, generation, extras);
-    const genAdjusted = baseCost * genModifier;
+    // Age from birthdate
+    const birth = new Date(birthdate);
+    const now = new Date();
+    const ageMonths = Math.max(
+        0,
+        Math.floor((now - birth) / (1000 * 60 * 60 * 24 * 30.437))
+    );
 
-    // ----- Age -----
-    const monthlyRate = 0.025;
-    const ageAdjusted = genAdjusted * Math.pow(1 + monthlyRate, ageMonths);
+    const genAdjusted = baseCost * getGenerationModifier(category, generation, extras);
+    const ageAdjusted = calculateAgeAdjusted(genAdjusted, category, ageMonths);
+    const populationAdjusted = ageAdjusted * getPopulationModifier(generation, population, extras);
 
-    // ----- Population -----
-    const popModifier = getPopulationModifier(generation, population, extras);
-    const populationAdjusted = ageAdjusted * popModifier;
-
-    // ----- Extras -----
     const extrasAdded = calculateExtras(
         populationAdjusted,
         category,
         generation,
+        ageMonths,
         extras
     );
 
-    const finalValue = populationAdjusted + extrasAdded;
-
-    const suggested =
-        finalValue < 10000
-            ? "Less than 10,000"
-            : (Math.round(finalValue / 10000) * 10000).toLocaleString();
+    let finalValue = populationAdjusted + extrasAdded;
+    finalValue = calculateMarketInfluence(finalValue, market);
 
     return {
-        category,
         baseCost: Math.floor(baseCost),
         generationAdjusted: Math.floor(genAdjusted),
-        ageAdjusted: Math.floor(ageAdjusted),
-        populationAdjusted: Math.floor(populationAdjusted),
-        extrasAdded: Math.floor(extrasAdded),
-        finalValue: Math.floor(finalValue),
-        suggested
+        ageMonths,
+        finalValue: Math.floor(finalValue)
     };
 }
+
 
 // ===============================
 //  UI HANDLING
 // ===============================
-
-function toggleCustomField() {
-    const category = document.getElementById("category").value;
-    const wrapper = document.getElementById("customBaseWrapper");
-
-    wrapper.style.display = category === "CUSTOM" ? "block" : "none";
-}
-
 function runCalc() {
     const category   = document.getElementById("category").value;
     const customBase = Number(document.getElementById("customBase").value || 0);
     const generation = Number(document.getElementById("generation").value);
-    const ageMonths  = Number(document.getElementById("age").value);
+    const birthdate  = document.getElementById("birthdate").value;
     const population = Number(document.getElementById("population").value);
+
+    const market = {
+        week: Number(document.getElementById("market7").value || 0),
+        month: Number(document.getElementById("market30").value || 0),
+        current: Number(document.getElementById("marketCurrent").value || 0)
+    };
 
     const extras = Array.from(
         document.querySelectorAll(".extras-grid input:checked")
@@ -393,23 +437,20 @@ function runCalc() {
         category,
         customBase,
         generation,
-        ageMonths,
+        birthdate,
         population,
-        extras
+        extras,
+        market
     });
 
     document.getElementById("output").textContent = `
-Category: ${result.category}
-Base Value: ${result.baseCost}
-Gen Adjusted: ${result.generationAdjusted}
-Age Adjusted: ${result.ageAdjusted}
-Population Adjusted: ${result.populationAdjusted}
-Extras Added: ${result.extrasAdded}
+Base: ${result.baseCost.toLocaleString()}
+Age: ${result.ageMonths} months
 --------------------------------
 FINAL VALUE: ${result.finalValue.toLocaleString()}
-Suggested: ${result.suggested}
 `.trim();
 }
+
 
 </script>
 <div class="box">
@@ -436,8 +477,8 @@ Suggested: ${result.suggested}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.31<br>
-        <strong>Last Updated:</strong> 12-16-2025 10:20 XST
+        <strong>Version:</strong> 1.40<br>
+        <strong>Last Updated:</strong> 12-16-2025 16:40 XST
     </p>
 </div>
 
