@@ -414,15 +414,15 @@ function calculateValue({
 // ===============================
 function runCalc() {
     const category   = document.getElementById("category").value;
-    const customBase = Number(document.getElementById("customBase")?.value || 0);
+    const customBase = Number(document.getElementById("customBase").value || 0);
     const generation = Number(document.getElementById("generation").value);
     const birthdate  = document.getElementById("birthdate").value;
     const population = Number(document.getElementById("population").value);
 
     const market = {
-        week: Number(document.getElementById("market7")?.value || 0),
-        month: Number(document.getElementById("market30")?.value || 0),
-        current: Number(document.getElementById("marketCurrent")?.value || 0)
+        week: Number(document.getElementById("market7").value || 0),
+        month: Number(document.getElementById("market30").value || 0),
+        current: Number(document.getElementById("marketCurrent").value || 0)
     };
 
     const extras = Array.from(
@@ -439,28 +439,19 @@ function runCalc() {
         market
     });
 
-    // helper to safely format numbers
-    const fmt = v =>
-        typeof v === "number" ? v.toLocaleString() : "—";
-
+    // ---- OUTPUT (only fields that EXIST) ----
     document.getElementById("output").textContent = `
 Category: ${result.category}
---------------------------------
-Base Value: ${fmt(result.baseCost)}
-Generation Adjusted: ${fmt(result.generationAdjusted)}
-Age Adjusted: ${fmt(result.ageAdjusted)}
-Population Adjusted: ${fmt(result.populationAdjusted)}
-Extras Added: ${fmt(result.extrasAdded)}
 
-Market Influence:
-• 7d Avg: ${fmt(result.market?.week)}
-• 30d Avg: ${fmt(result.market?.month)}
-• Current: ${fmt(result.market?.current)}
-• Market Weight: ${fmt(result.marketInfluence)}
+Base Value: ${result.baseCost.toLocaleString()}
+Generation Adjusted: ${result.generationAdjusted.toLocaleString()}
+Age Adjusted: ${result.ageAdjusted.toLocaleString()}
+Population Adjusted: ${result.populationAdjusted.toLocaleString()}
+Extras Added: ${result.extrasAdded.toLocaleString()}
 
 --------------------------------
-FINAL VALUE: ${fmt(result.finalValue)}
-Suggested: ${result.suggested || "—"}
+FINAL VALUE: ${result.finalValue.toLocaleString()}
+Suggested: ${result.suggested}
 `.trim();
 }
 
@@ -489,8 +480,8 @@ Suggested: ${result.suggested || "—"}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.42<br>
-        <strong>Last Updated:</strong> 12-17-2025 09:10 XST
+        <strong>Version:</strong> 1.43<br>
+        <strong>Last Updated:</strong> 12-17-2025 09:15 XST
     </p>
 </div>
 
