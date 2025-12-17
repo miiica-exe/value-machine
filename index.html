@@ -323,7 +323,6 @@ function calculateExtras(value, category, generation, ageMonths, extras) {
         if (!rule) return;
 
         if (extra === "Manual" && generation < 2) return;
-        if (extra === "BreedOnly" && generation === 1) return;
 
         // Ungrown special behavior
         if (extra === "Ungrown") {
