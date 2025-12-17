@@ -201,7 +201,7 @@ const EXTRA_EFFECTS = {
         default: v => 4000000
     },
     Glitched: {
-        default: v => v * 0.15
+        default: v => v * 0.15 + 80000
     },
     Manual: {
         default: v => v * 0.25
@@ -210,7 +210,7 @@ const EXTRA_EFFECTS = {
         default: v => v * 0.20
     },
     AllCarrier: {
-    default: v => v * 0.99
+        default: v => v * 0.99
     },
     Event: {
         default: v => (v * 0.35) + 350000
@@ -225,7 +225,8 @@ const EXTRA_EFFECTS = {
         default: v => v * 0.10
     },
     Parentless: {
-        default: v => v * 0.15
+        default: v => v * 0.15,
+        "Elder": v => v * 0.25
     },
     Childless: {
         default: v => v * 0.10
@@ -329,7 +330,7 @@ function calculateExtras(value, category, generation, ageMonths, extras) {
             if (ageMonths >= 120) {
                 total += value; // doubles value
             } else if (ageMonths < 3) {
-                total -= value * 0.15;
+                total -= value * 0.03;
             }
             return;
         }
@@ -490,7 +491,7 @@ FINAL VALUE: ${result.finalValue.toLocaleString()}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.45<br>
+        <strong>Version:</strong> 1.46<br>
         <strong>Last Updated:</strong> 12-17-2025 13:40 XST
     </p>
 </div>
