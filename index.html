@@ -440,10 +440,17 @@ function runCalc() {
     });
 
     document.getElementById("output").textContent = `
-Base: ${result.baseCost.toLocaleString()}
+Category: ${result.category}
+Base Value: ${result.baseCost.toLocaleString()}
+Generation Adjusted: ${result.generationAdjusted.toLocaleString()}
 Age: ${result.ageMonths} months
+Age Adjusted: ${result.ageAdjusted.toLocaleString()}
+Population Adjusted: ${result.populationAdjusted.toLocaleString()}
+Extras Added: ${result.extrasAdded.toLocaleString()}
+${result.marketAdjusted !== undefined ? `Market Influence: ${result.marketAdjusted.toLocaleString()}` : ""}
 --------------------------------
 FINAL VALUE: ${result.finalValue.toLocaleString()}
+Suggested: ${result.suggested}
 `.trim();
 }
 
@@ -474,7 +481,7 @@ FINAL VALUE: ${result.finalValue.toLocaleString()}
 
     <p style="font-size: 0.9em; color: #666;">
         <strong>Version:</strong> 1.41<br>
-        <strong>Last Updated:</strong> 12-17-2025 07:45 XST
+        <strong>Last Updated:</strong> 12-17-2025 07:55 XST
     </p>
 </div>
 
