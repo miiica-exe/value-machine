@@ -434,26 +434,25 @@ function runCalc() {
         customBase,
         generation,
         birthdate,
+        ageAdjusted,
         population,
         extras,
         market
     });
 
-    // ---- OUTPUT (only fields that EXIST) ----
-    document.getElementById("output").textContent = `
+    // ---- OUTPUT ----
+document.getElementById("output").textContent = `
 Category: ${result.category}
-
+--------------------------------
 Base Value: ${result.baseCost.toLocaleString()}
 Generation Adjusted: ${result.generationAdjusted.toLocaleString()}
 Age Adjusted: ${result.ageAdjusted.toLocaleString()}
 Population Adjusted: ${result.populationAdjusted.toLocaleString()}
 Extras Added: ${result.extrasAdded.toLocaleString()}
-
 --------------------------------
 FINAL VALUE: ${result.finalValue.toLocaleString()}
 Suggested: ${result.suggested}
 `.trim();
-}
 
 </script>
 <div class="box">
