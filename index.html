@@ -468,7 +468,6 @@ function toggleCustomField() {
     const wrapper = document.getElementById("customBaseWrapper");
 
     wrapper.style.display = (category === "CUSTOM") ? "block" : "none";
-}
     document.addEventListener("DOMContentLoaded", () => {
     const categorySelect = document.getElementById("category");
     categorySelect.addEventListener("change", toggleCustomField);
