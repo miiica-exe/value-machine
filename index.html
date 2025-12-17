@@ -469,6 +469,14 @@ function toggleCustomField() {
 
     wrapper.style.display = (category === "CUSTOM") ? "block" : "none";
 }
+    document.addEventListener("DOMContentLoaded", () => {
+    const categorySelect = document.getElementById("category");
+    categorySelect.addEventListener("change", toggleCustomField);
+
+    // run once on load so state is correct
+    toggleCustomField();
+});
+
 
     // ---- OUTPUT ----
     document.getElementById("output").textContent = `
