@@ -22,6 +22,16 @@
         margin-bottom: 20px;
         border-radius: 10px;
     }
+    .market-grid {
+    display: flex;
+    gap: 1rem; /* space between the labels */
+    flex-wrap: wrap; /* optional, wraps if the screen is too narrow */
+}
+
+.market-grid label {
+    display: flex;
+    flex-direction: column; /* keeps the text above the input */
+}
     label { display: block; margin-top: 10px; }
     input, select {
         background: #15212a;
