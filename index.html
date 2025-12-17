@@ -353,13 +353,13 @@ function calculateMarketInfluence(finalValue, market) {
 
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
 
-    // All three filled → market dominates
+    // All three filled → market dominates 90%
     if (values.length === 3) {
-        return (finalValue * 0.35) + (avg * 0.65);
+        return (finalValue * 0.20) + (avg * 0.80);
     }
 
-    // Partial influence
-    return (finalValue * 0.6) + (avg * 0.4);
+    // Partial influence → 60% calc, 40% market
+    return (finalValue * 0.60) + (avg * 0.40);
 }
 
 
@@ -439,7 +439,15 @@ function runCalc() {
         extras,
         market
     });
+    // ---- Calculate Market separately ----
+    const marketValues = [];
+    if (market.week > 0) marketValues.push(market.week);
+    if (market.month > 0) marketValues.push(market.month);
+    if (market.current > 0) marketValues.push(market.current);
 
+    const marketSuggested = marketValues.length > 0 
+        ? Math.floor(marketValues.reduce((a,b)=>a+b,0)/marketValues.length) 
+        : 0;
     // ---- OUTPUT ----
     document.getElementById("output").textContent = `
 Category: ${result.category}
@@ -449,6 +457,7 @@ Generation Adjusted: ${result.generationAdjusted.toLocaleString()}
 Age Adjusted: ${result.ageAdjusted.toLocaleString()}
 Population Adjusted: ${result.populationAdjusted.toLocaleString()}
 Extras Added: ${result.extrasAdded.toLocaleString()}
+Market Consideration: ${marketSuggested.toLocaleString()}
 --------------------------------
 FINAL VALUE: ${result.finalValue.toLocaleString()}
 `.trim();
@@ -478,8 +487,8 @@ FINAL VALUE: ${result.finalValue.toLocaleString()}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.43<br>
-        <strong>Last Updated:</strong> 12-17-2025 10:10 XST
+        <strong>Version:</strong> 1.44<br>
+        <strong>Last Updated:</strong> 12-17-2025 10:30 XST
     </p>
 </div>
 
