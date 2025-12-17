@@ -462,6 +462,14 @@ function runCalc() {
     const marketSuggested = marketValues.length > 0 
         ? Math.floor(marketValues.reduce((a,b)=>a+b,0)/marketValues.length) 
         : 0;
+    
+function toggleCustomField() {
+    const category = document.getElementById("category").value;
+    const wrapper = document.getElementById("customBaseWrapper");
+
+    wrapper.style.display = (category === "CUSTOM") ? "block" : "none";
+}
+
     // ---- OUTPUT ----
     document.getElementById("output").textContent = `
 Category: ${result.category}
