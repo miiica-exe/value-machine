@@ -69,6 +69,25 @@
         border-radius: 10px;
         white-space: pre-wrap;
     }
+    /* DETAILS LAYOUT */
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+/* Full-width rows */
+    .details-grid .full {
+        grid-column: 1 / -1;
+}
+
+/* Three-up row */
+    .details-row-3 {
+        display: grid;
+       grid-template-columns: repeat(3, 1fr);
+       gap: 12px;
+}
+
 </style>
 </head>
 
@@ -208,7 +227,7 @@ const EXTRA_EFFECTS = {
     Manual: { default: v => v * 0.25 },
     BreedOnly: { default: v => v * 0.20 },
     AllCarrier: { default: v => v * 0.99 },
-    Event: { default: v => (v * 0.35) + 350000 },
+    Event: { default: v => (v * 0.40) + 360000 },
     Painted: { default: v => 500000 },
     Rare: {
         default: v => v * 0.05,
@@ -480,7 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <p style="font-size: 0.9em; color: #666;">
         <strong>Version:</strong> 1.48<br>
-        <strong>Last Updated:</strong> 12-18-2025 12:05 XST
+        <strong>Last Updated:</strong> 12-18-2025 12:35 XST
     </p>
 </div>
 
