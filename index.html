@@ -162,7 +162,6 @@
     <pre id="output">Fill in values and click Calculate.</pre>
 </div>
 
-
 <script>
 // ===============================
 //  VALUE MACHINE — CORE LOGIC
@@ -185,8 +184,7 @@ const CATEGORY_BASE_COSTS = {
 };
 
 
-// ---------- AGE CURVES (CATEGORY-SPECIFIC) ----------
-// Faster growth in first 12 months, slower afterward
+// ---------- AGE CURVES ----------
 const AGE_CURVES = {
     "Redstone":     { early: 0.045, late: 0.015 },
     "Redstone(2)":  { early: 0.045, late: 0.015 },
@@ -205,47 +203,25 @@ const AGE_CURVES = {
 
 // ---------- EXTRA EFFECTS ----------
 const EXTRA_EFFECTS = {
-    Ethereal: {
-        default: v => 4000000
-    },
-    Glitched: {
-        default: v => v * 0.15 + 80000
-    },
-    Manual: {
-        default: v => v * 0.25
-    },
-    BreedOnly: {
-        default: v => v * 0.20
-    },
-    AllCarrier: {
-        default: v => v * 0.99
-    },
-    Event: {
-        default: v => (v * 0.35) + 350000
-    },
-    Painted: {
-        default: v => 500000
-    },
+    Ethereal: { default: v => 4000000 },
+    Glitched: { default: v => v * 0.15 + 80000 },
+    Manual: { default: v => v * 0.25 },
+    BreedOnly: { default: v => v * 0.20 },
+    AllCarrier: { default: v => v * 0.99 },
+    Event: { default: v => (v * 0.35) + 350000 },
+    Painted: { default: v => 500000 },
     Rare: {
         default: v => v * 0.05,
         "Battle": v => v * 0.45 + 350000
     },
-    Effect: {
-        default: v => v * 0.10
-    },
+    Effect: { default: v => v * 0.10 },
     Parentless: {
         default: v => v * 0.15,
         "Elder": v => v * 0.25
     },
-    Childless: {
-        default: v => v * 0.10
-    },
-    Ungrown: {
-        default: v => 0
-    },
-    Unbreedable: {
-        default: v => 200000
-    }
+    Childless: { default: v => v * 0.10 },
+    Ungrown: { default: v => 0 },
+    Unbreedable: { default: v => 200000 }
 };
 
 
@@ -262,11 +238,8 @@ function getBaseCost(category, customBase) {
 
 // ---------- GENERATION MODIFIER ----------
 function getGenerationModifier(category, generation, extras) {
+    const isRedstone = category.includes("Redstone");
 
-    const isRedstone =
-        category.includes("Redstone");
-
-    // Ethereal ignores ALL generation penalties
     if (extras.includes("Ethereal")) return 1;
 
     let modifier = 1;
@@ -278,7 +251,6 @@ function getGenerationModifier(category, generation, extras) {
         modifier = isRedstone ? 1 : (1 / 3);
     }
 
-    // Softening
     const softeningExtras = ["Glitched", "BreedOnly", "Manual"];
     if (softeningExtras.some(e => extras.includes(e))) {
         modifier = 1 - ((1 - modifier) / 2);
@@ -293,7 +265,6 @@ function calculateAgeAdjusted(value, category, ageMonths) {
     const curve = AGE_CURVES[category] || AGE_CURVES["CUSTOM"];
 
     let adjusted = value;
-
     const earlyMonths = Math.min(ageMonths, 12);
     const lateMonths = Math.max(ageMonths - 12, 0);
 
@@ -335,20 +306,14 @@ function calculateExtras(value, category, generation, ageMonths, extras) {
 
         if (extra === "Manual" && generation < 2) return;
 
-        // Ungrown special behavior
         if (extra === "Ungrown") {
-            if (ageMonths >= 120) {
-                total += value; // doubles value
-            } else if (ageMonths < 3) {
-                total -= value * 0.03;
-            }
+            if (ageMonths >= 120) total += value;
+            else if (ageMonths < 3) total -= value * 0.03;
             return;
         }
 
         const fn = rule[category] || rule.default;
-        if (typeof fn === "function") {
-            total += fn(value);
-        }
+        if (typeof fn === "function") total += fn(value);
     });
 
     return total;
@@ -358,7 +323,6 @@ function calculateExtras(value, category, generation, ageMonths, extras) {
 // ---------- MARKET INFLUENCE ----------
 function calculateMarketInfluence(finalValue, market) {
     const values = [];
-
     if (market.week > 0) values.push(market.week);
     if (market.month > 0) values.push(market.month);
     if (market.current > 0) values.push(market.current);
@@ -367,12 +331,10 @@ function calculateMarketInfluence(finalValue, market) {
 
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
 
-    // All three filled → market dominates 90%
     if (values.length === 3) {
         return (finalValue * 0.20) + (avg * 0.80);
     }
 
-    // Partial influence → 60% calc, 40% market
     return (finalValue * 0.60) + (avg * 0.40);
 }
 
@@ -391,7 +353,6 @@ function calculateValue({
 }) {
     const baseCost = getBaseCost(category, customBase);
 
-    // Age from birthdate
     const birth = new Date(birthdate);
     const now = new Date();
     const ageMonths = Math.max(
@@ -414,16 +375,18 @@ function calculateValue({
     let finalValue = populationAdjusted + extrasAdded;
     finalValue = calculateMarketInfluence(finalValue, market);
 
-return {
-    category,
-    baseCost: Math.floor(baseCost),
-    generationAdjusted: Math.floor(genAdjusted),
-    ageAdjusted: Math.floor(ageAdjusted),
-    populationAdjusted: Math.floor(populationAdjusted),
-    extrasAdded: Math.floor(extrasAdded),
-    finalValue: Math.floor(finalValue)
+    return {
+        category,
+        baseCost: Math.floor(baseCost),
+        generationAdjusted: Math.floor(genAdjusted),
+        ageAdjusted: Math.floor(ageAdjusted),
+        populationAdjusted: Math.floor(populationAdjusted),
+        extrasAdded: Math.floor(extrasAdded),
+        finalValue: Math.floor(finalValue)
     };
 }
+
+
 // ===============================
 //  UI HANDLING
 // ===============================
@@ -453,32 +416,16 @@ function runCalc() {
         extras,
         market
     });
-    // ---- Calculate Market separately ----
+
     const marketValues = [];
     if (market.week > 0) marketValues.push(market.week);
     if (market.month > 0) marketValues.push(market.month);
     if (market.current > 0) marketValues.push(market.current);
 
-    const marketSuggested = marketValues.length > 0 
-        ? Math.floor(marketValues.reduce((a,b)=>a+b,0)/marketValues.length) 
-        : 0;
-    
-function toggleCustomField() {
-    const category = document.getElementById("category").value;
-    const wrapper = document.getElementById("customBaseWrapper");
+    const marketSuggested = marketValues.length > 0
+        ? Math.floor(marketValues.reduce((a, b) => a + b, 0) / marketValues.length)
+        : result.finalValue;
 
-    wrapper.style.display = (category === "CUSTOM") ? "block" : "none";
-    document.addEventListener("DOMContentLoaded", () => {
-    const categorySelect = document.getElementById("category");
-    categorySelect.addEventListener("change", toggleCustomField);
-
-    // run once on load so state is correct
-    toggleCustomField();
-});
-
-const marketSuggested = result.marketSuggested ?? result.finalValue;
-
-    // ---- OUTPUT ----
     document.getElementById("output").textContent = `
 Category: ${result.category}
 --------------------------------
@@ -492,7 +439,22 @@ Market Consideration: ${marketSuggested.toLocaleString()}
 FINAL VALUE: ${result.finalValue.toLocaleString()}
 `.trim();
 }
+
+
+// ---------- CUSTOM CATEGORY TOGGLE ----------
+function toggleCustomField() {
+    const category = document.getElementById("category").value;
+    const wrapper = document.getElementById("customBaseWrapper");
+    wrapper.style.display = (category === "CUSTOM") ? "block" : "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const categorySelect = document.getElementById("category");
+    categorySelect.addEventListener("change", toggleCustomField);
+    toggleCustomField();
+});
 </script>
+
 <div class="box">
     <h2>How This Works</h2>
 
@@ -517,8 +479,8 @@ FINAL VALUE: ${result.finalValue.toLocaleString()}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.47<br>
-        <strong>Last Updated:</strong> 12-18-2025 09:40 XST
+        <strong>Version:</strong> 1.48<br>
+        <strong>Last Updated:</strong> 12-18-2025 12:05 XST
     </p>
 </div>
 
