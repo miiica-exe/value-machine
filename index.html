@@ -476,6 +476,7 @@ function toggleCustomField() {
     toggleCustomField();
 });
 
+const marketSuggested = result.marketSuggested ?? result.finalValue;
 
     // ---- OUTPUT ----
     document.getElementById("output").textContent = `
@@ -490,7 +491,7 @@ Market Consideration: ${marketSuggested.toLocaleString()}
 --------------------------------
 FINAL VALUE: ${result.finalValue.toLocaleString()}
 `.trim();
-    
+}
 </script>
 <div class="box">
     <h2>How This Works</h2>
@@ -516,8 +517,8 @@ FINAL VALUE: ${result.finalValue.toLocaleString()}
     <hr>
 
     <p style="font-size: 0.9em; color: #666;">
-        <strong>Version:</strong> 1.46<br>
-        <strong>Last Updated:</strong> 12-17-2025 16:45 XST
+        <strong>Version:</strong> 1.47<br>
+        <strong>Last Updated:</strong> 12-18-2025 09:40 XST
     </p>
 </div>
 
