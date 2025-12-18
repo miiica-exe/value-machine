@@ -69,32 +69,23 @@
         border-radius: 10px;
         white-space: pre-wrap;
     }
-    /* DETAILS LAYOUT */
     .details-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
-
-/* Full-width rows */
     .details-grid .full {
         grid-column: 1 / -1;
 }
-
-/* Three-up row */
     .details-row-3 {
         display: grid;
        grid-template-columns: repeat(3, 1fr);
        gap: 12px;
 }
-
 </style>
 </head>
-
 <body>
-
 <h1>Value Machine</h1>
-
 <div class="box">
     <h2>Pet Value Calculator</h2>
     <h4>Market value(if any)</h4>
@@ -103,12 +94,10 @@
         Sales (past 7 days)
         <input id="market7" type="number" value="0">
     </label>
-
     <label>
         Sales (past 30 days)
         <input id="market30" type="number" value="0">
     </label>
-
     <label>
         Current Listings
         <input id="marketCurrent" type="number" value="0">
@@ -116,45 +105,51 @@
 </div>
 <hr>
     <h4>Details</h4>
-<div class="calc-grid">
-
-    <div class="field">
+<div class="details-grid">
+    <div>
         <label>Category</label>
-<select id="category">
-    <option>Main</option>
-    <option>Stray</option>
-    <option>Battle</option>
-    <option>Premium</option>
-    <option>Seasonal</option>
-    <option>Orphan</option>
-    <option>Greystone</option>
-    <option>Redstone</option>
-    <option>Redstone(2)</option>
-    <option>Redstone(4)</option>
-    <option>Quest/Award</option>
-    <option value="CUSTOM">Custom</option>
-</select>
+        <select id="category">
+            <option>Main</option>
+            <option>Stray</option>
+            <option>Battle</option>
+            <option>Premium</option>
+            <option>Seasonal</option>
+            <option>Orphan</option>
+            <option>Greystone</option>
+            <option>Redstone</option>
+            <option>Redstone(2)</option>
+            <option>Redstone(4)</option>
+            <option>Quest/Award</option>
+            <option value="CUSTOM">Custom</option>
+        </select>
+    </div>
+    <div id="customBaseWrapper" style="display:none;">
+        <label>Custom Value (coins)</label>
+        <input id="customBase" type="number" value="0">
+    </div>
+    <div class="details-row-3 full">
+        <div>
+            <label>
+                Generation
+                <abbr title="If the pet is G1, use the G1 population from the library. Otherwise use total.">?</abbr>
+            </label>
+            <input id="generation" type="number" value="1">
+        </div>
 
-<!-- Hidden until Custom is selected -->
-<div id="customBaseWrapper" style="display:none; margin-top:10px;">
-    <label>Custom Value(coins)</label>
-    <input id="customBase" type="number" value="0">
+        <div>
+            <label>
+                Birthdate
+                <abbr title="To see a pet's birthdate, go to your pet's page > click on where it says x days/month/years ago.">?</abbr>
+            </label>
+            <input id="birthdate" type="date">
+        </div>
+        <div>
+            <label>Population</label>
+            <input id="population" type="number" value="100">
+        </div>
+    </div>
 </div>
 
-<label>
-    Generation
-    <abbr title="If the pet is G1, use the G1 population from the library. Otherwise use total.">?</abbr>
-</label>
-<input id="generation" type="number" value="1">
-
-<label>
-    Birthdate
-    <abbr title="To see a pet's birthdate, go to your pet's page > click on where it says x days/month/years ago.">?</abbr>
-</label>
-<input id="birthdate" type="date">
-
-<label>Population</label>
-<input id="population" type="number" value="100">
 
 <label>Extras (select any):</label>
 <div class="extras-grid">
