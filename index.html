@@ -216,7 +216,7 @@ const AGE_CURVES = {
     "Seasonal":     { early: 0.028, late: 0.012 },
     "Orphan":       { early: 0.025,  late: 0.011 },
     "Quest/Award":  { early: 0.02,  late: 0.008 },
-    "Main":         { early: 0.025, late: 0.08 },
+    "Main":         { early: 0.025, late: 0.085 },
     "Stray":        { early: 0.020, late: 0.07 },
     "CUSTOM":       { early: 0.03,  late: 0.02 }
 };
@@ -225,7 +225,12 @@ const AGE_CURVES = {
 // ---------- EXTRA EFFECTS ----------
 const EXTRA_EFFECTS = {
     Ethereal: { default: v => 4000000 },
-    Glitched: { default: v => v * 0.15 + 80000 },
+    Glitched: { 
+        default: v => v * 0.15 + 80000,
+        "Main": v => v * 0.15 + 300000,
+        "Orphan": v => v * 0.16 + 600000,
+        "Stray": v => v * 0.18 + 450000    
+    },
     Manual: { default: v => v * 0.25 },
     BreedOnly: { default: v => v * 0.20 },
     AllCarrier: { default: v => v * 0.99 },
@@ -239,7 +244,13 @@ const EXTRA_EFFECTS = {
     },
     Effect: { default: v => v * 0.12 },
     Parentless: {
-        default: v => v * 0.15
+        default: v => v * 0.15,
+        "Redstone": v => v * 0.16,
+        "Redstone(2)": v => v * 0.17,
+        "Redstone(4)": v => v * 0.18,
+        "Quest/Award": v => v * 0.19,
+        "Main": v => v * 0.20,
+        "Battle": v => v * 0.21
     },
     Childless: { default: v => v * 0.10 },
     Ungrown: { default: v => 0 },
